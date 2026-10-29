@@ -9,7 +9,7 @@ from database import engine, get_db
 
 # Crear las tablas en la base de datos al iniciar
 models.Base.metadata.create_all(bind=engine)
-app = FastAPI(title="E-Commerce Supermercado API")
+app = FastAPI(title="Mercado Marte")
 
 # Permitir peticiones desde el frontend de React
 app.add_middleware(

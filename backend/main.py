@@ -3,7 +3,10 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
-
+import os
+import stripe
+from dotenv import load_dotenv
+from pydantic import BaseModel
 import models
 import schemas
 from database import engine, get_db
@@ -11,6 +14,51 @@ from database import engine, get_db
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="E-Commerce Supermercado API")
+load_dotenv()
+
+# Obtener la Secret Key de las variables de entorno
+stripe_secret_key = os.getenv("STRIPE_SECRET_KEY")
+if not stripe_secret_key:
+    raise RuntimeError("No se encontró STRIPE_SECRET_KEY en el archivo .env")
+
+stripe.api_key = stripe_secret_key
+
+# Crear tablas en SQLite al iniciar
+models.Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="E-Commerce Supermercado API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Esquema Pydantic para la solicitud de pago
+class PaymentRequest(BaseModel):
+    amount: float
+
+@app.get("/")
+def read_root():
+    return {"mensaje": "API de Supermercado lista"}
+
+# Endpoint para Stripe Sandbox usando las variables de entorno de forma segura
+@app.post("/create-payment-intent")
+def create_payment_intent(data: PaymentRequest):
+    try:
+        # Convertir monto a centavos (MXN)
+        amount_in_cents = int(round(data.amount * 100))
+        
+        intent = stripe.PaymentIntent.create(
+            amount=amount_in_cents,
+            currency="mxn",
+            payment_method_types=["card"],
+        )
+        return {"clientSecret": intent.client_secret}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 app.add_middleware(
     CORSMiddleware,

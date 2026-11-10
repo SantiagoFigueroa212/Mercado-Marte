@@ -48,14 +48,23 @@ export function CartPage() {
 
           {/* Botones de Pago Rápido */}
           <div className="quick-pay-options">
-            <div className="quick-pay-btn yellow-btn">
+            <div 
+              className="quick-pay-btn yellow-btn" 
+              onClick={() => navigate('/checkout/pago')}
+              style={{ cursor: 'pointer' }}
+            >
               <div>
                 <strong>Pagar en 1 clic</strong>
                 <p>Visa •••• 4242 • envío guardado</p>
               </div>
               <span className="pay-icon">⚡</span>
             </div>
-            <div className="quick-pay-btn white-btn">
+
+            <div 
+              className="quick-pay-btn white-btn" 
+              onClick={() => navigate('/checkout/pago')}
+              style={{ cursor: 'pointer' }}
+            >
               <div>
                 <strong>Pagar con QR</strong>
                 <p>Desde tu app bancaria</p>

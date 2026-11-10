@@ -4,6 +4,9 @@ import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-do
 import { ProductList } from './components/ProductList';
 import { ProductDetail } from './components/ProductDetail';
 import { CartPage } from './components/CartPage';
+import { PaymentPage } from './components/Paymentpage';
+import { ConfirmationPage } from './components/Confirmationpage';
+import { ErrorPage } from './components/ErrorPage';
 import { CartProvider, useCart } from './context/CartContext';
 import './App.css';
 
@@ -14,7 +17,7 @@ function HeaderNav() {
   return (
     <header className="app-header">
       <div className="header-content">
-        <Link to="/" className="brand-logo">
+        <Link to="/" className="brand-logo" style={{ textDecoration: 'none' }}>
           <h1>Mercado Marte 🛒</h1>
         </Link>
 
@@ -40,6 +43,9 @@ function App() {
               <Route path="/" element={<ProductList />} />
               <Route path="/producto/:id" element={<ProductDetail />} />
               <Route path="/carrito" element={<CartPage />} />
+              <Route path="/checkout/pago" element={<PaymentPage />} />
+              <Route path="/checkout/confirmacion" element={<ConfirmationPage />} />
+              <Route path="/checkout/error" element={<ErrorPage />} />
             </Routes>
           </main>
         </div>

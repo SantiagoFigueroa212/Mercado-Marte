@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 
 export function CartPage() {
-  const { cart, updateQuantity, removeFromCart, totalAmount } = useCart();
+  const { cart, updateQuantity, removeFromCart, totalAmount, clearCart } = useCart();
   const navigate = useNavigate();
 
   // Cálculos dinámicos
@@ -15,6 +15,7 @@ export function CartPage() {
   const shippingCost = totalAmount > 0 ? (totalAmount >= freeShippingThreshold ? 0.0 : 3.50) : 0.0;
   const taxes = totalAmount * 0.08; // 8% estimado de impuestos
   const finalTotal = totalAmount + shippingCost + taxes;
+  
 
   return (
     <div className="checkout-container">
@@ -49,9 +50,13 @@ export function CartPage() {
           {/* Botones de Pago Rápido */}
           <div className="quick-pay-options">
             <div 
-              className="quick-pay-btn yellow-btn" 
-              onClick={() => navigate('/checkout/pago')}
-              style={{ cursor: 'pointer' }}
+              className="quick-pay-btn yellow-btn"
+              onClick={() => {
+                if (cart.length === 0) return;
+                clearCart();
+                navigate('/checkout/confirmacion', { state: { amount: finalTotal } });
+              }}
+              style={{ cursor: cart.length > 0 ? 'pointer' : 'not-allowed', opacity: cart.length > 0 ? 1 : 0.6 }}
             >
               <div>
                 <strong>Pagar en 1 clic</strong>
@@ -60,11 +65,7 @@ export function CartPage() {
               <span className="pay-icon">⚡</span>
             </div>
 
-            <div 
-              className="quick-pay-btn white-btn" 
-              onClick={() => navigate('/checkout/pago')}
-              style={{ cursor: 'pointer' }}
-            >
+            <div className="quick-pay-btn white-btn" style={{ opacity: 0.7 }}>
               <div>
                 <strong>Pagar con QR</strong>
                 <p>Desde tu app bancaria</p>
@@ -73,7 +74,27 @@ export function CartPage() {
             </div>
           </div>
 
-          <div className="divider-text">O CONTINÚA PASO A PASO</div>
+          {/* Botón para flujo paso a paso (Stripe Sandbox) */}
+          <div style={{ margin: '24px 0', textAlign: 'center' }}>
+            <button
+              onClick={() => navigate('/checkout/pago')}
+              disabled={cart.length === 0}
+              style={{
+                width: '100%',
+                backgroundColor: cart.length > 0 ? '#0f172a' : '#94a3b8',
+                color: '#ffffff',
+                padding: '14px 20px',
+                borderRadius: '10px',
+                border: 'none',
+                fontSize: '0.95rem',
+                fontWeight: '600',
+                letterSpacing: '0.5px',
+                cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
+              }}
+            >
+              Continuar paso a paso (Pagar con tarjeta) →
+            </button>
+          </div>
 
           {/* Lista de productos */}
           {cart.length === 0 ? (

@@ -48,16 +48,16 @@ def read_root():
 @app.post("/create-payment-intent")
 def create_payment_intent(data: PaymentRequest):
     try:
-        # Convertir monto a centavos (MXN)
         amount_in_cents = int(round(data.amount * 100))
         
         intent = stripe.PaymentIntent.create(
             amount=amount_in_cents,
             currency="mxn",
-            payment_method_types=["card"],
+            automatic_payment_methods={"enabled": True},
         )
         return {"clientSecret": intent.client_secret}
     except Exception as e:
+        print("ERROR DE STRIPE:", str(e))
         raise HTTPException(status_code=400, detail=str(e))
 
 app.add_middleware(

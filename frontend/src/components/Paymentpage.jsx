@@ -1,3 +1,4 @@
+// frontend/src/components/PaymentPage.jsx
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
@@ -49,10 +50,10 @@ function CheckoutForm({ finalTotal }) {
   return (
     <form onSubmit={handleSubmit} className="stripe-form">
       <div className="card-input-box">
-        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-          Ingresa los datos de tu tarjeta (Prueba Stripe):
+        <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#0f172a' }}>
+          Ingresa los datos de tu tarjeta de crédito o débito:
         </label>
-        <div style={{ border: '1px solid #cbd5e1', padding: '12px', borderRadius: '8px', backgroundColor: '#ffffff' }}>
+        <div style={{ border: '1px solid #cbd5e1', padding: '14px', borderRadius: '10px', backgroundColor: '#ffffff' }}>
           <CardElement 
             options={{
               style: {
@@ -71,20 +72,20 @@ function CheckoutForm({ finalTotal }) {
       <button 
         type="submit" 
         disabled={!stripe || loading} 
-        className="submit-pay-btn"
         style={{
           width: '100%',
           backgroundColor: '#0f172a',
           color: '#ffffff',
-          padding: '12px',
-          borderRadius: '8px',
+          padding: '14px',
+          borderRadius: '10px',
           border: 'none',
           fontWeight: 'bold',
-          marginTop: '16px',
+          fontSize: '1rem',
+          marginTop: '20px',
           cursor: loading ? 'not-allowed' : 'pointer'
         }}
       >
-        {loading ? "Procesando pago..." : "Continuar a revisión"}
+        {loading ? "Procesando pago..." : `Pagar $${finalTotal.toFixed(2)} MXN`}
       </button>
     </form>
   );
@@ -93,7 +94,6 @@ function CheckoutForm({ finalTotal }) {
 export function PaymentPage() {
   const { cart, totalAmount } = useCart();
   const navigate = useNavigate();
-  const [selectedMethod, setSelectedMethod] = useState('card');
 
   const shippingCost = totalAmount > 150 ? 0 : 3.50;
   const taxes = totalAmount * 0.08;
@@ -110,50 +110,26 @@ export function PaymentPage() {
 
       <div className="cart-page-grid">
         <div className="cart-left-column">
-          <h1>Método de pago</h1>
+          <h1>Pago con tarjeta</h1>
+          <p style={{ color: '#64748b', marginBottom: '24px' }}>
+            Completa tu compra de forma segura a través de Stripe.
+          </p>
 
-          <div className="payment-methods-grid">
-            <div 
-              className={`method-card ${selectedMethod === 'saved' ? 'selected' : ''}`}
-              onClick={() => setSelectedMethod('saved')}
-            >
-              <span className="badge-yellow">RECOMENDADO</span>
-              <h3>Visa •••• 4242</h3>
-              <p>Tarjeta guardada · sin escribir nada</p>
-            </div>
-
-            <div 
-              className={`method-card ${selectedMethod === 'qr' ? 'selected' : ''}`}
-              onClick={() => setSelectedMethod('qr')}
-            >
-              <span className="badge-yellow">SIN COMISIÓN</span>
-              <h3>Pago con QR</h3>
-              <p>Escanea desde tu app bancaria</p>
-            </div>
-
-            <div 
-              className={`method-card ${selectedMethod === 'card' ? 'selected' : ''}`}
-              onClick={() => setSelectedMethod('card')}
-            >
-              <h3>Nueva tarjeta</h3>
-              <p>Crédito o débito</p>
-            </div>
+          <div className="stripe-container" style={{ backgroundColor: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <Elements stripe={stripePromise}>
+              <CheckoutForm finalTotal={finalTotal} />
+            </Elements>
           </div>
 
-          {selectedMethod === 'card' && (
-            <div className="stripe-container" style={{ marginTop: '20px' }}>
-              <Elements stripe={stripePromise}>
-                <CheckoutForm finalTotal={finalTotal} />
-              </Elements>
-            </div>
-          )}
-
-          <div className="security-footer" style={{ marginTop: '20px', fontSize: '0.8rem', color: '#64748b' }}>
+          <div style={{ marginTop: '20px', fontSize: '0.8rem', color: '#64748b' }}>
             🔒 Tus datos se cifran y nunca se almacenan en nuestros servidores (PCI DSS nivel 1).
           </div>
 
-          <button className="back-link" onClick={() => navigate('/carrito')} style={{ marginTop: '16px', background: 'none', border: 'none', color: '#0f172a', cursor: 'pointer' }}>
-            ← Volver
+          <button 
+            onClick={() => navigate('/carrito')} 
+            style={{ marginTop: '20px', background: 'none', border: 'none', color: '#0f172a', cursor: 'pointer', fontWeight: '600' }}
+          >
+            ← Volver al carrito
           </button>
         </div>
 
